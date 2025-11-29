@@ -1,30 +1,48 @@
+import logging
 import pandas as pd
+
+logger = logging.getLogger(__name__)
 
 
 def analyze_basic(df: pd.DataFrame) -> None:
     """
     基础结构与质量检查。
     """
+    logger.info("开始基础分析...")
+    logger.debug(f"数据形状: {df.shape[0]} 行 × {df.shape[1]} 列")
+    
     print("=== 基础信息 ===")
     print(f"行数 × 列数: {df.shape[0]} × {df.shape[1]}")
     print("\n列名：")
     print(list(df.columns))
+    
+    missing_values = df.isna().sum()
+    total_missing = missing_values.sum()
+    if total_missing > 0:
+        logger.warning(f"发现 {total_missing} 个缺失值")
+    else:
+        logger.info("数据完整，无缺失值")
+    
     print("\n前 5 行：")
     print(df.head())
     print("\n缺失值统计：")
-    print(df.isna().sum())
+    print(missing_values)
     print("\n描述性统计：")
     print(df.describe(include="all"))
+    
+    logger.info("基础分析完成")
 
 
 def analyze_trend(df: pd.DataFrame) -> None:
     """
     年度销量与价格趋势分析（结合实际列：Year, Price_USD, Sales_Volume）。
     """
+    logger.info("开始趋势分析...")
     cols = set(df.columns)
 
     print("\n=== 年度销量趋势（Sales_Volume）===")
     if {"Year", "Sales_Volume"}.issubset(cols):
+        logger.debug("执行年度销量聚合...")
         yearly_vol = (
             df.groupby("Year")["Sales_Volume"]
             .sum()
@@ -37,11 +55,14 @@ def analyze_trend(df: pd.DataFrame) -> None:
             yearly_vol["Total_Sales_Volume"].pct_change() * 100
         ).round(2)
         print(yearly_vol)
+        logger.info(f"年度销量趋势分析完成，覆盖 {len(yearly_vol)} 个年份")
     else:
+        logger.warning("缺少 Year / Sales_Volume 列，无法做年度销量聚合")
         print("缺少 Year / Sales_Volume 列，无法做年度销量聚合。")
 
     print("\n=== 年度平均价格 & 收入趋势（如列存在）===")
     if {"Year", "Sales_Volume", "Price_USD"}.issubset(cols):
+        logger.debug("执行年度价格和收入分析...")
         df_rev = df.copy()
         df_rev["Revenue_USD"] = df_rev["Price_USD"] * df_rev["Sales_Volume"]
         yearly_price_rev = (
@@ -59,8 +80,12 @@ def analyze_trend(df: pd.DataFrame) -> None:
             / yearly_price_rev["Total_Sales_Volume"].clip(lower=1)
         ).round(2)
         print(yearly_price_rev)
+        logger.info(f"年度价格和收入分析完成")
     else:
+        logger.warning("缺少 Year / Sales_Volume / Price_USD 列，无法做年度价格与收入分析")
         print("缺少 Year / Sales_Volume / Price_USD 列，无法做年度价格与收入分析。")
+    
+    logger.info("趋势分析完成")
 
 
 def analyze_mix(df: pd.DataFrame) -> None:
@@ -68,10 +93,12 @@ def analyze_mix(df: pd.DataFrame) -> None:
     车型结构、区域结构等分布分析。
     基于实际列：Model, Region, Sales_Volume, Price_USD。
     """
+    logger.info("开始结构分析...")
     cols = set(df.columns)
 
     print("\n=== 车型销量结构（Sales_Volume）===")
     if {"Model", "Sales_Volume"}.issubset(cols):
+        logger.debug("执行车型销量结构分析...")
         model_units = (
             df.groupby("Model")["Sales_Volume"]
             .sum()
@@ -82,11 +109,14 @@ def analyze_mix(df: pd.DataFrame) -> None:
             model_units["Sales_Volume"] / model_units["Sales_Volume"].sum() * 100
         ).round(2)
         print(model_units.head(20))
+        logger.info(f"车型销量结构分析完成，共 {len(model_units)} 个车型")
     else:
+        logger.warning("缺少 Model / Sales_Volume 列，无法做车型结构分析")
         print("缺少 Model / Sales_Volume 列，无法做车型结构分析。")
 
     print("\n=== 区域销量结构（Sales_Volume）===")
     if {"Region", "Sales_Volume"}.issubset(cols):
+        logger.debug("执行区域销量结构分析...")
         region_units = (
             df.groupby("Region")["Sales_Volume"]
             .sum()
@@ -97,8 +127,12 @@ def analyze_mix(df: pd.DataFrame) -> None:
             region_units["Sales_Volume"] / region_units["Sales_Volume"].sum() * 100
         ).round(2)
         print(region_units)
+        logger.info(f"区域销量结构分析完成，共 {len(region_units)} 个区域")
     else:
+        logger.warning("缺少 Region / Sales_Volume 列，无法做区域结构分析")
         print("缺少 Region / Sales_Volume 列，无法做区域结构分析。")
+    
+    logger.info("结构分析完成")
 
 
 
@@ -107,14 +141,17 @@ def analyze_revenue(df: pd.DataFrame) -> None:
     收入与单车价格分析。
     基于实际列：Price_USD（单车价格）、Sales_Volume（销量）。
     """
+    logger.info("开始收入和价格分析...")
     cols = set(df.columns)
 
     print("\n=== 收入/价格分析 ===")
     if not {"Price_USD", "Sales_Volume"}.issubset(cols):
+        logger.warning("缺少 Price_USD / Sales_Volume 列，无法做收入与单车价格分析")
         print("缺少 Price_USD / Sales_Volume 列，无法做收入与单车价格分析。")
         return
 
     df_valid = df[df["Sales_Volume"] > 0].copy()
+    logger.debug(f"过滤后有效数据行数: {len(df_valid)}")
     df_valid["Revenue_USD"] = df_valid["Price_USD"] * df_valid["Sales_Volume"]
 
     print("\n整体单车价格（Price_USD）分布：")
@@ -126,6 +163,7 @@ def analyze_revenue(df: pd.DataFrame) -> None:
     )  # 总体订单收入分布（每一行是一个组合：车型/区域/配置）
 
     if "Model" in cols:
+        logger.debug("执行按车型的收入分析...")
         model_rev = (
             df_valid.groupby("Model")
             .agg(
@@ -142,8 +180,10 @@ def analyze_revenue(df: pd.DataFrame) -> None:
         ).round(2)
         print("\n按车型的销量、收入和加权 ASP：")
         print(model_rev.head(20))
+        logger.info(f"按车型收入分析完成，共 {len(model_rev)} 个车型")
 
     if "Region" in cols:
+        logger.debug("执行按区域的收入分析...")
         region_rev = (
             df_valid.groupby("Region")
             .agg(
@@ -160,8 +200,10 @@ def analyze_revenue(df: pd.DataFrame) -> None:
         ).round(2)
         print("\n按区域的销量、收入和加权 ASP：")
         print(region_rev)
+        logger.info(f"按区域收入分析完成，共 {len(region_rev)} 个区域")
 
     if "Engine_Size_L" in cols:
+        logger.debug("执行按发动机排量的价格分析...")
         print("\n按发动机排量区间的平均价格：")
         engine_price = (
             df_valid.groupby("Engine_Size_L")["Price_USD"]
@@ -170,6 +212,9 @@ def analyze_revenue(df: pd.DataFrame) -> None:
             .sort_values("Engine_Size_L")
         )
         print(engine_price)
+        logger.info(f"按发动机排量价格分析完成")
+    
+    logger.info("收入和价格分析完成")
 
 
 def _build_summary_for_ai(df: pd.DataFrame) -> dict:
@@ -177,6 +222,7 @@ def _build_summary_for_ai(df: pd.DataFrame) -> dict:
     将关键指标预聚合为一个紧凑的 JSON，用于喂给 GPT 做解读。
     只传结构化数字，不传明细，降低 token 成本。
     """
+    logger.info("开始构建AI报告数据摘要...")
     summary: dict = {}
     cols = set(df.columns)
 
@@ -273,6 +319,7 @@ def _build_summary_for_ai(df: pd.DataFrame) -> dict:
     if extra_insights:
         summary["extra_numeric_insights"] = extra_insights
 
+    logger.info(f"AI报告数据摘要构建完成，包含 {len(summary)} 个主要维度")
     return summary
 
 

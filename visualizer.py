@@ -8,28 +8,28 @@ logger = logging.getLogger(__name__)
 
 def plot_all_charts(df: pd.DataFrame) -> None:
     """
-    生成图表并保存到当前目录：
-      1. 年度总销量 + YoY 增长（双轴）
-      2. 年度总收入 + 加权 ASP
-      3. 车型销量 Top 10
-      4. 车型收入 Top 10
-      5. 车型加权 ASP
-      6. 区域销量
-      7. 区域收入
-      8. 区域加权 ASP
-      9. 年份 × 区域销量热力图
-     12. 价格分布直方图 + KDE
-     13. 发动机排量 vs 平均价格
-     14. 里程数 vs 价格 散点图
+    Generate charts and save to current directory:
+      1. Annual total sales + YoY growth (dual axis)
+      2. Annual total revenue + weighted ASP
+      3. Top 10 models by sales volume
+      4. Top 10 models by revenue
+      5. Weighted ASP by model
+      6. Sales volume by region
+      7. Revenue by region
+      8. Weighted ASP by region
+      9. Year × Region sales volume heatmap
+     12. Price distribution histogram + KDE
+     13. Engine size vs average price
+     14. Mileage vs price scatter plot
     """
-    logger.info("开始生成所有图表...")
+    logger.info("Starting to generate all charts...")
     sns.set(style="whitegrid", font_scale=1.1)
     
     chart_count = 0
 
-    # 图1：年度总销量 + YoY 增长
+    # Chart 1: Annual total sales + YoY growth
     if {"Year", "Sales_Volume"}.issubset(df.columns):
-        logger.debug("生成图表1: 年度总销量 + YoY 增长")
+        logger.debug("Generating chart 1: Annual total sales + YoY growth")
         try:
             yearly = (
                 df.groupby("Year")["Sales_Volume"]
@@ -56,18 +56,18 @@ def plot_all_charts(df: pd.DataFrame) -> None:
             plt.savefig("chart_01_year_volume_yoy.png")
             plt.close(fig)
             chart_count += 1
-            logger.info("✓ 图表1生成成功: chart_01_year_volume_yoy.png")
+            logger.info("✓ Chart 1 generated successfully: chart_01_year_volume_yoy.png")
         except Exception as e:
-            logger.error(f"生成图表1失败: {e}", exc_info=True)
+            logger.error(f"Failed to generate chart 1: {e}", exc_info=True)
 
-    # 为后续收入/ASP 分析预先算好 Revenue
+    # Pre-calculate Revenue for subsequent revenue/ASP analysis
     df_rev = df.copy()
     if {"Price_USD", "Sales_Volume"}.issubset(df_rev.columns):
         df_rev["Revenue_USD"] = df_rev["Price_USD"] * df_rev["Sales_Volume"]
 
-    # 图2：年度总收入 + 加权 ASP
+    # Chart 2: Annual total revenue + weighted ASP
     if {"Year", "Sales_Volume", "Price_USD"}.issubset(df.columns):
-        logger.debug("生成图表2: 年度总收入 + 加权 ASP")
+        logger.debug("Generating chart 2: Annual total revenue + weighted ASP")
         try:
             yearly_rev = (
                 df_rev.groupby("Year")
@@ -105,11 +105,11 @@ def plot_all_charts(df: pd.DataFrame) -> None:
             plt.savefig("chart_02_year_revenue_asp.png")
             plt.close(fig)
             chart_count += 1
-            logger.info("✓ 图表2生成成功: chart_02_year_revenue_asp.png")
+            logger.info("✓ Chart 2 generated successfully: chart_02_year_revenue_asp.png")
         except Exception as e:
-            logger.error(f"生成图表2失败: {e}", exc_info=True)
+            logger.error(f"Failed to generate chart 2: {e}", exc_info=True)
 
-    # 车型聚合：为图3–5 准备
+    # Model aggregation: prepare for charts 3–5
     model_agg = None
     if {"Model", "Sales_Volume", "Price_USD"}.issubset(df.columns):
         model_agg = (
@@ -126,9 +126,9 @@ def plot_all_charts(df: pd.DataFrame) -> None:
             / model_agg["Total_Sales_Volume"].clip(lower=1)
         )
 
-    # 图3：车型销量 Top 10
+    # Chart 3: Top 10 models by sales volume
     if model_agg is not None:
-        logger.debug("生成图表3: 车型销量 Top 10")
+        logger.debug("Generating chart 3: Top 10 models by sales volume")
         try:
             top_models_by_vol = model_agg.sort_values(
                 "Total_Sales_Volume", ascending=False
@@ -147,13 +147,13 @@ def plot_all_charts(df: pd.DataFrame) -> None:
             plt.savefig("chart_03_model_top10_volume.png")
             plt.close()
             chart_count += 1
-            logger.info("✓ 图表3生成成功: chart_03_model_top10_volume.png")
+            logger.info("✓ Chart 3 generated successfully: chart_03_model_top10_volume.png")
         except Exception as e:
-            logger.error(f"生成图表3失败: {e}", exc_info=True)
+            logger.error(f"Failed to generate chart 3: {e}", exc_info=True)
 
-    # 图4：车型收入 Top 10
+    # Chart 4: Top 10 models by revenue
     if model_agg is not None:
-        logger.debug("生成图表4: 车型收入 Top 10")
+        logger.debug("Generating chart 4: Top 10 models by revenue")
         try:
             top_models_by_rev = model_agg.sort_values(
                 "Total_Revenue_USD", ascending=False
@@ -172,13 +172,13 @@ def plot_all_charts(df: pd.DataFrame) -> None:
             plt.savefig("chart_04_model_top10_revenue.png")
             plt.close()
             chart_count += 1
-            logger.info("✓ 图表4生成成功: chart_04_model_top10_revenue.png")
+            logger.info("✓ Chart 4 generated successfully: chart_04_model_top10_revenue.png")
         except Exception as e:
-            logger.error(f"生成图表4失败: {e}", exc_info=True)
+            logger.error(f"Failed to generate chart 4: {e}", exc_info=True)
 
-    # 图5：车型加权 ASP
+    # Chart 5: Weighted ASP by model
     if model_agg is not None:
-        logger.debug("生成图表5: 车型加权 ASP")
+        logger.debug("Generating chart 5: Weighted ASP by model")
         try:
             plt.figure(figsize=(8, 4))
             sns.barplot(
@@ -194,11 +194,11 @@ def plot_all_charts(df: pd.DataFrame) -> None:
             plt.savefig("chart_05_model_weighted_asp.png")
             plt.close()
             chart_count += 1
-            logger.info("✓ 图表5生成成功: chart_05_model_weighted_asp.png")
+            logger.info("✓ Chart 5 generated successfully: chart_05_model_weighted_asp.png")
         except Exception as e:
-            logger.error(f"生成图表5失败: {e}", exc_info=True)
+            logger.error(f"Failed to generate chart 5: {e}", exc_info=True)
 
-    # 区域聚合：为图6–8、图9 准备
+    # Regional aggregation: prepare for charts 6–8 and chart 9
     region_agg = None
     if {"Region", "Sales_Volume", "Price_USD"}.issubset(df.columns):
         region_agg = (
@@ -215,9 +215,9 @@ def plot_all_charts(df: pd.DataFrame) -> None:
             / region_agg["Total_Sales_Volume"].clip(lower=1)
         )
 
-    # 图6：区域销量
+    # Chart 6: Sales volume by region
     if region_agg is not None:
-        logger.debug("生成图表6: 区域销量")
+        logger.debug("Generating chart 6: Sales volume by region")
         try:
             plt.figure(figsize=(7, 4))
             sns.barplot(
@@ -233,13 +233,13 @@ def plot_all_charts(df: pd.DataFrame) -> None:
             plt.savefig("chart_06_region_volume.png")
             plt.close()
             chart_count += 1
-            logger.info("✓ 图表6生成成功: chart_06_region_volume.png")
+            logger.info("✓ Chart 6 generated successfully: chart_06_region_volume.png")
         except Exception as e:
-            logger.error(f"生成图表6失败: {e}", exc_info=True)
+            logger.error(f"Failed to generate chart 6: {e}", exc_info=True)
 
-    # 图7：区域收入
+    # Chart 7: Revenue by region
     if region_agg is not None:
-        logger.debug("生成图表7: 区域收入")
+        logger.debug("Generating chart 7: Revenue by region")
         try:
             plt.figure(figsize=(7, 4))
             sns.barplot(
@@ -255,13 +255,13 @@ def plot_all_charts(df: pd.DataFrame) -> None:
             plt.savefig("chart_07_region_revenue.png")
             plt.close()
             chart_count += 1
-            logger.info("✓ 图表7生成成功: chart_07_region_revenue.png")
+            logger.info("✓ Chart 7 generated successfully: chart_07_region_revenue.png")
         except Exception as e:
-            logger.error(f"生成图表7失败: {e}", exc_info=True)
+            logger.error(f"Failed to generate chart 7: {e}", exc_info=True)
 
-    # 图8：区域加权 ASP
+    # Chart 8: Weighted ASP by region
     if region_agg is not None:
-        logger.debug("生成图表8: 区域加权 ASP")
+        logger.debug("Generating chart 8: Weighted ASP by region")
         try:
             plt.figure(figsize=(7, 4))
             sns.barplot(
@@ -277,13 +277,13 @@ def plot_all_charts(df: pd.DataFrame) -> None:
             plt.savefig("chart_08_region_weighted_asp.png")
             plt.close()
             chart_count += 1
-            logger.info("✓ 图表8生成成功: chart_08_region_weighted_asp.png")
+            logger.info("✓ Chart 8 generated successfully: chart_08_region_weighted_asp.png")
         except Exception as e:
-            logger.error(f"生成图表8失败: {e}", exc_info=True)
+            logger.error(f"Failed to generate chart 8: {e}", exc_info=True)
 
-    # 图9：年份 × 区域销量热力图
+    # Chart 9: Year × Region sales volume heatmap
     if {"Year", "Region", "Sales_Volume"}.issubset(df.columns):
-        logger.debug("生成图表9: 年份×区域销量热力图")
+        logger.debug("Generating chart 9: Year × Region sales volume heatmap")
         try:
             pivot = (
                 df.groupby(["Year", "Region"])["Sales_Volume"]
@@ -305,13 +305,13 @@ def plot_all_charts(df: pd.DataFrame) -> None:
             plt.savefig("chart_09_year_region_heatmap.png")
             plt.close()
             chart_count += 1
-            logger.info("✓ 图表9生成成功: chart_09_year_region_heatmap.png")
+            logger.info("✓ Chart 9 generated successfully: chart_09_year_region_heatmap.png")
         except Exception as e:
-            logger.error(f"生成图表9失败: {e}", exc_info=True)
+            logger.error(f"Failed to generate chart 9: {e}", exc_info=True)
 
-    # 图12：价格分布直方图 + KDE
+    # Chart 12: Price distribution histogram + KDE
     if "Price_USD" in df.columns:
-        logger.debug("生成图表12: 价格分布直方图 + KDE")
+        logger.debug("Generating chart 12: Price distribution histogram + KDE")
         try:
             plt.figure(figsize=(7, 4))
             sns.histplot(
@@ -327,13 +327,13 @@ def plot_all_charts(df: pd.DataFrame) -> None:
             plt.savefig("chart_12_price_distribution.png")
             plt.close()
             chart_count += 1
-            logger.info("✓ 图表12生成成功: chart_12_price_distribution.png")
+            logger.info("✓ Chart 12 generated successfully: chart_12_price_distribution.png")
         except Exception as e:
-            logger.error(f"生成图表12失败: {e}", exc_info=True)
+            logger.error(f"Failed to generate chart 12: {e}", exc_info=True)
 
-    # 图13：发动机排量 vs 平均价格
+    # Chart 13: Engine size vs average price
     if {"Engine_Size_L", "Price_USD"}.issubset(df.columns):
-        logger.debug("生成图表13: 发动机排量 vs 平均价格")
+        logger.debug("Generating chart 13: Engine size vs average price")
         try:
             engine_price = (
                 df.groupby("Engine_Size_L")["Price_USD"]
@@ -356,13 +356,13 @@ def plot_all_charts(df: pd.DataFrame) -> None:
             plt.savefig("chart_13_engine_size_vs_price.png")
             plt.close()
             chart_count += 1
-            logger.info("✓ 图表13生成成功: chart_13_engine_size_vs_price.png")
+            logger.info("✓ Chart 13 generated successfully: chart_13_engine_size_vs_price.png")
         except Exception as e:
-            logger.error(f"生成图表13失败: {e}", exc_info=True)
+            logger.error(f"Failed to generate chart 13: {e}", exc_info=True)
 
-    # 图14：里程数 vs 价格 散点图
+    # Chart 14: Mileage vs price scatter plot
     if {"Mileage_KM", "Price_USD"}.issubset(df.columns):
-        logger.debug("生成图表14: 里程数 vs 价格散点图")
+        logger.debug("Generating chart 14: Mileage vs price scatter plot")
         try:
             plt.figure(figsize=(8, 4))
             sns.scatterplot(
@@ -378,11 +378,11 @@ def plot_all_charts(df: pd.DataFrame) -> None:
             plt.savefig("chart_14_mileage_vs_price.png")
             plt.close()
             chart_count += 1
-            logger.info("✓ 图表14生成成功: chart_14_mileage_vs_price.png")
+            logger.info("✓ Chart 14 generated successfully: chart_14_mileage_vs_price.png")
         except Exception as e:
-            logger.error(f"生成图表14失败: {e}", exc_info=True)
+            logger.error(f"Failed to generate chart 14: {e}", exc_info=True)
     
-    logger.info(f"所有图表生成完成，共成功生成 {chart_count} 个图表")
+    logger.info(f"All charts generated successfully, total {chart_count} charts created")
 
 
 

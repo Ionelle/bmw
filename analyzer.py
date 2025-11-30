@@ -6,43 +6,43 @@ logger = logging.getLogger(__name__)
 
 def analyze_basic(df: pd.DataFrame) -> None:
     """
-    基础结构与质量检查。
+    Basic structure and quality check.
     """
-    logger.info("开始基础分析...")
-    logger.debug(f"数据形状: {df.shape[0]} 行 × {df.shape[1]} 列")
+    logger.info("Starting basic analysis...")
+    logger.debug(f"Data shape: {df.shape[0]} rows × {df.shape[1]} columns")
     
-    print("=== 基础信息 ===")
-    print(f"行数 × 列数: {df.shape[0]} × {df.shape[1]}")
-    print("\n列名：")
+    print("=== Basic Information ===")
+    print(f"Rows × Columns: {df.shape[0]} × {df.shape[1]}")
+    print("\nColumn names:")
     print(list(df.columns))
     
     missing_values = df.isna().sum()
     total_missing = missing_values.sum()
     if total_missing > 0:
-        logger.warning(f"发现 {total_missing} 个缺失值")
+        logger.warning(f"Found {total_missing} missing values")
     else:
-        logger.info("数据完整，无缺失值")
+        logger.info("Data is complete, no missing values")
     
-    print("\n前 5 行：")
+    print("\nFirst 5 rows:")
     print(df.head())
-    print("\n缺失值统计：")
+    print("\nMissing values statistics:")
     print(missing_values)
-    print("\n描述性统计：")
+    print("\nDescriptive statistics:")
     print(df.describe(include="all"))
     
-    logger.info("基础分析完成")
+    logger.info("Basic analysis completed")
 
 
 def analyze_trend(df: pd.DataFrame) -> None:
     """
-    年度销量与价格趋势分析（结合实际列：Year, Price_USD, Sales_Volume）。
+    Annual sales and price trend analysis (using actual columns: Year, Price_USD, Sales_Volume).
     """
-    logger.info("开始趋势分析...")
+    logger.info("Starting trend analysis...")
     cols = set(df.columns)
 
-    print("\n=== 年度销量趋势（Sales_Volume）===")
+    print("\n=== Annual Sales Trend (Sales_Volume) ===")
     if {"Year", "Sales_Volume"}.issubset(cols):
-        logger.debug("执行年度销量聚合...")
+        logger.debug("Performing annual sales aggregation...")
         yearly_vol = (
             df.groupby("Year")["Sales_Volume"]
             .sum()
@@ -50,19 +50,19 @@ def analyze_trend(df: pd.DataFrame) -> None:
             .sort_values("Year")
         )
         yearly_vol.rename(columns={"Sales_Volume": "Total_Sales_Volume"}, inplace=True)
-        # 计算同比增长率
+        # Calculate year-over-year growth rate
         yearly_vol["YoY_growth_%"] = (
             yearly_vol["Total_Sales_Volume"].pct_change() * 100
         ).round(2)
         print(yearly_vol)
-        logger.info(f"年度销量趋势分析完成，覆盖 {len(yearly_vol)} 个年份")
+        logger.info(f"Annual sales trend analysis completed, covering {len(yearly_vol)} years")
     else:
-        logger.warning("缺少 Year / Sales_Volume 列，无法做年度销量聚合")
-        print("缺少 Year / Sales_Volume 列，无法做年度销量聚合。")
+        logger.warning("Missing Year / Sales_Volume columns, cannot perform annual sales aggregation")
+        print("Missing Year / Sales_Volume columns, cannot perform annual sales aggregation.")
 
-    print("\n=== 年度平均价格 & 收入趋势（如列存在）===")
+    print("\n=== Annual Average Price & Revenue Trend (if columns exist) ===")
     if {"Year", "Sales_Volume", "Price_USD"}.issubset(cols):
-        logger.debug("执行年度价格和收入分析...")
+        logger.debug("Performing annual price and revenue analysis...")
         df_rev = df.copy()
         df_rev["Revenue_USD"] = df_rev["Price_USD"] * df_rev["Sales_Volume"]
         yearly_price_rev = (
@@ -80,25 +80,25 @@ def analyze_trend(df: pd.DataFrame) -> None:
             / yearly_price_rev["Total_Sales_Volume"].clip(lower=1)
         ).round(2)
         print(yearly_price_rev)
-        logger.info(f"年度价格和收入分析完成")
+        logger.info(f"Annual price and revenue analysis completed")
     else:
-        logger.warning("缺少 Year / Sales_Volume / Price_USD 列，无法做年度价格与收入分析")
-        print("缺少 Year / Sales_Volume / Price_USD 列，无法做年度价格与收入分析。")
+        logger.warning("Missing Year / Sales_Volume / Price_USD columns, cannot perform annual price and revenue analysis")
+        print("Missing Year / Sales_Volume / Price_USD columns, cannot perform annual price and revenue analysis.")
     
-    logger.info("趋势分析完成")
+    logger.info("Trend analysis completed")
 
 
 def analyze_mix(df: pd.DataFrame) -> None:
     """
-    车型结构、区域结构等分布分析。
-    基于实际列：Model, Region, Sales_Volume, Price_USD。
+    Model structure, regional structure and other distribution analysis.
+    Based on actual columns: Model, Region, Sales_Volume, Price_USD.
     """
-    logger.info("开始结构分析...")
+    logger.info("Starting structural analysis...")
     cols = set(df.columns)
 
-    print("\n=== 车型销量结构（Sales_Volume）===")
+    print("\n=== Model Sales Structure (Sales_Volume) ===")
     if {"Model", "Sales_Volume"}.issubset(cols):
-        logger.debug("执行车型销量结构分析...")
+        logger.debug("Performing model sales structure analysis...")
         model_units = (
             df.groupby("Model")["Sales_Volume"]
             .sum()
@@ -109,14 +109,14 @@ def analyze_mix(df: pd.DataFrame) -> None:
             model_units["Sales_Volume"] / model_units["Sales_Volume"].sum() * 100
         ).round(2)
         print(model_units.head(20))
-        logger.info(f"车型销量结构分析完成，共 {len(model_units)} 个车型")
+        logger.info(f"Model sales structure analysis completed, total {len(model_units)} models")
     else:
-        logger.warning("缺少 Model / Sales_Volume 列，无法做车型结构分析")
-        print("缺少 Model / Sales_Volume 列，无法做车型结构分析。")
+        logger.warning("Missing Model / Sales_Volume columns, cannot perform model structure analysis")
+        print("Missing Model / Sales_Volume columns, cannot perform model structure analysis.")
 
-    print("\n=== 区域销量结构（Sales_Volume）===")
+    print("\n=== Regional Sales Structure (Sales_Volume) ===")
     if {"Region", "Sales_Volume"}.issubset(cols):
-        logger.debug("执行区域销量结构分析...")
+        logger.debug("Performing regional sales structure analysis...")
         region_units = (
             df.groupby("Region")["Sales_Volume"]
             .sum()
@@ -127,43 +127,43 @@ def analyze_mix(df: pd.DataFrame) -> None:
             region_units["Sales_Volume"] / region_units["Sales_Volume"].sum() * 100
         ).round(2)
         print(region_units)
-        logger.info(f"区域销量结构分析完成，共 {len(region_units)} 个区域")
+        logger.info(f"Regional sales structure analysis completed, total {len(region_units)} regions")
     else:
-        logger.warning("缺少 Region / Sales_Volume 列，无法做区域结构分析")
-        print("缺少 Region / Sales_Volume 列，无法做区域结构分析。")
+        logger.warning("Missing Region / Sales_Volume columns, cannot perform regional structure analysis")
+        print("Missing Region / Sales_Volume columns, cannot perform regional structure analysis.")
     
-    logger.info("结构分析完成")
+    logger.info("Structural analysis completed")
 
 
 
 def analyze_revenue(df: pd.DataFrame) -> None:
     """
-    收入与单车价格分析。
-    基于实际列：Price_USD（单车价格）、Sales_Volume（销量）。
+    Revenue and per-vehicle price analysis.
+    Based on actual columns: Price_USD (per-vehicle price), Sales_Volume (sales volume).
     """
-    logger.info("开始收入和价格分析...")
+    logger.info("Starting revenue and price analysis...")
     cols = set(df.columns)
 
-    print("\n=== 收入/价格分析 ===")
+    print("\n=== Revenue/Price Analysis ===")
     if not {"Price_USD", "Sales_Volume"}.issubset(cols):
-        logger.warning("缺少 Price_USD / Sales_Volume 列，无法做收入与单车价格分析")
-        print("缺少 Price_USD / Sales_Volume 列，无法做收入与单车价格分析。")
+        logger.warning("Missing Price_USD / Sales_Volume columns, cannot perform revenue and per-vehicle price analysis")
+        print("Missing Price_USD / Sales_Volume columns, cannot perform revenue and per-vehicle price analysis.")
         return
 
     df_valid = df[df["Sales_Volume"] > 0].copy()
-    logger.debug(f"过滤后有效数据行数: {len(df_valid)}")
+    logger.debug(f"Valid data rows after filtering: {len(df_valid)}")
     df_valid["Revenue_USD"] = df_valid["Price_USD"] * df_valid["Sales_Volume"]
 
-    print("\n整体单车价格（Price_USD）分布：")
+    print("\nOverall per-vehicle price (Price_USD) distribution:")
     print(df_valid["Price_USD"].describe())
 
-    print("\n整体收入（Revenue_USD）情况：")
+    print("\nOverall revenue (Revenue_USD) situation:")
     print(
         df_valid["Revenue_USD"].describe()
-    )  # 总体订单收入分布（每一行是一个组合：车型/区域/配置）
+    )  # Overall order revenue distribution (each row is a combination: model/region/configuration)
 
     if "Model" in cols:
-        logger.debug("执行按车型的收入分析...")
+        logger.debug("Performing revenue analysis by model...")
         model_rev = (
             df_valid.groupby("Model")
             .agg(
@@ -178,12 +178,12 @@ def analyze_revenue(df: pd.DataFrame) -> None:
             model_rev["Total_Revenue_USD"]
             / model_rev["Total_Sales_Volume"].clip(lower=1)
         ).round(2)
-        print("\n按车型的销量、收入和加权 ASP：")
+        print("\nSales volume, revenue and weighted ASP by model:")
         print(model_rev.head(20))
-        logger.info(f"按车型收入分析完成，共 {len(model_rev)} 个车型")
+        logger.info(f"Revenue analysis by model completed, total {len(model_rev)} models")
 
     if "Region" in cols:
-        logger.debug("执行按区域的收入分析...")
+        logger.debug("Performing revenue analysis by region...")
         region_rev = (
             df_valid.groupby("Region")
             .agg(
@@ -198,13 +198,13 @@ def analyze_revenue(df: pd.DataFrame) -> None:
             region_rev["Total_Revenue_USD"]
             / region_rev["Total_Sales_Volume"].clip(lower=1)
         ).round(2)
-        print("\n按区域的销量、收入和加权 ASP：")
+        print("\nSales volume, revenue and weighted ASP by region:")
         print(region_rev)
-        logger.info(f"按区域收入分析完成，共 {len(region_rev)} 个区域")
+        logger.info(f"Revenue analysis by region completed, total {len(region_rev)} regions")
 
     if "Engine_Size_L" in cols:
-        logger.debug("执行按发动机排量的价格分析...")
-        print("\n按发动机排量区间的平均价格：")
+        logger.debug("Performing price analysis by engine size...")
+        print("\nAverage price by engine size range:")
         engine_price = (
             df_valid.groupby("Engine_Size_L")["Price_USD"]
             .mean()
@@ -212,21 +212,21 @@ def analyze_revenue(df: pd.DataFrame) -> None:
             .sort_values("Engine_Size_L")
         )
         print(engine_price)
-        logger.info(f"按发动机排量价格分析完成")
+        logger.info(f"Price analysis by engine size completed")
     
-    logger.info("收入和价格分析完成")
+    logger.info("Revenue and price analysis completed")
 
 
 def _build_summary_for_ai(df: pd.DataFrame) -> dict:
     """
-    将关键指标预聚合为一个紧凑的 JSON，用于喂给 GPT 做解读。
-    只传结构化数字，不传明细，降低 token 成本。
+    Pre-aggregate key metrics into a compact JSON for GPT interpretation.
+    Only pass structured numbers, not details, to reduce token cost.
     """
-    logger.info("开始构建AI报告数据摘要...")
+    logger.info("Starting to build AI report data summary...")
     summary: dict = {}
     cols = set(df.columns)
 
-    # 年度趋势
+    # Annual trends
     if {"Year", "Sales_Volume"}.issubset(cols):
         yearly = (
             df.groupby("Year")["Sales_Volume"]
@@ -237,7 +237,7 @@ def _build_summary_for_ai(df: pd.DataFrame) -> dict:
         yearly["YoY_growth_%"] = yearly["Sales_Volume"].pct_change() * 100
         summary["yearly_sales"] = yearly.round(2).to_dict(orient="records")
 
-    # 区域表现
+    # Regional performance
     if {"Region", "Sales_Volume", "Price_USD"}.issubset(cols):
         tmp = df.copy()
         tmp["Revenue_USD"] = tmp["Price_USD"] * tmp["Sales_Volume"]
@@ -256,7 +256,7 @@ def _build_summary_for_ai(df: pd.DataFrame) -> dict:
         )
         summary["region_summary"] = region_agg.round(2).to_dict(orient="records")
 
-    # 车型表现
+    # Model performance
     if {"Model", "Sales_Volume", "Price_USD"}.issubset(cols):
         tmp = df.copy()
         tmp["Revenue_USD"] = tmp["Price_USD"] * tmp["Sales_Volume"]
@@ -273,7 +273,7 @@ def _build_summary_for_ai(df: pd.DataFrame) -> dict:
             model_agg["Total_Revenue_USD"]
             / model_agg["Total_Sales_Volume"].clip(lower=1)
         )
-        # 只保留销量和收入前后若干，避免车型过多导致 token 过大
+        # Only keep top and bottom few by sales and revenue to avoid too many models causing excessive tokens
         summary["model_top_by_volume"] = (
             model_agg.sort_values("Total_Sales_Volume", ascending=False)
             .head(10)
@@ -293,7 +293,7 @@ def _build_summary_for_ai(df: pd.DataFrame) -> dict:
             .to_dict(orient="records")
         )
 
-    # 价格与排量、里程的关系（高层相关性，不做严格因果）
+    # Relationship between price and engine size, mileage (high-level correlation, not strict causality)
     extra_insights: dict = {}
     if {"Price_USD", "Engine_Size_L"}.issubset(cols):
         engine_price = (
@@ -306,7 +306,7 @@ def _build_summary_for_ai(df: pd.DataFrame) -> dict:
             engine_price.round(2).to_dict(orient="records")
         )
     if {"Price_USD", "Mileage_KM"}.issubset(cols):
-        # 为防止极值影响，使用样本相关系数
+        # Use sample correlation coefficient to prevent extreme value impact
         sample_df = df[["Price_USD", "Mileage_KM"]].dropna().sample(
             min(len(df), 5000), random_state=42
         )
@@ -319,7 +319,7 @@ def _build_summary_for_ai(df: pd.DataFrame) -> dict:
     if extra_insights:
         summary["extra_numeric_insights"] = extra_insights
 
-    logger.info(f"AI报告数据摘要构建完成，包含 {len(summary)} 个主要维度")
+    logger.info(f"AI report data summary construction completed, containing {len(summary)} main dimensions")
     return summary
 
 

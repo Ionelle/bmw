@@ -75,3 +75,80 @@
 2025-11-30 05:27:26,954 - __main__ - INFO - ==================================================
 2025-11-30 05:27:26,954 - __main__ - INFO - 所有分析流程执行完成
 2025-11-30 05:27:26,954 - __main__ - INFO - ==================================================
+2025-11-30 06:07:03,172 - __main__ - INFO - ==================================================
+2025-11-30 06:07:03,172 - __main__ - INFO - 开始BMW销售数据分析流程
+2025-11-30 06:07:03,172 - __main__ - INFO - ==================================================
+2025-11-30 06:07:03,172 - __main__ - INFO - 步骤 1/5: 加载数据...
+2025-11-30 06:07:03,172 - data_loader - INFO - 开始加载数据文件: /Users/fengjingran/Downloads/BMW-Case/BMW sales data (2020-2024).xlsx
+2025-11-30 06:07:03,780 - data_loader - INFO - 成功读取Excel文件，原始数据形状: (16701, 10)
+2025-11-30 06:07:03,781 - data_loader - INFO - 数据加载完成，最终数据形状: (16701, 10)
+2025-11-30 06:07:03,781 - __main__ - INFO - 数据加载成功，共 16701 行数据
+2025-11-30 06:07:03,781 - __main__ - INFO - 步骤 2/5: 执行基础分析...
+2025-11-30 06:07:03,781 - analyzer - INFO - 开始基础分析...
+2025-11-30 06:07:03,783 - analyzer - INFO - 数据完整，无缺失值
+2025-11-30 06:07:03,809 - analyzer - INFO - 基础分析完成
+2025-11-30 06:07:03,809 - __main__ - INFO - 步骤 3/5: 执行趋势分析...
+2025-11-30 06:07:03,809 - analyzer - INFO - 开始趋势分析...
+2025-11-30 06:07:03,813 - analyzer - INFO - 年度销量趋势分析完成，覆盖 5 个年份
+2025-11-30 06:07:03,821 - analyzer - INFO - 年度价格和收入分析完成
+2025-11-30 06:07:03,822 - analyzer - INFO - 趋势分析完成
+2025-11-30 06:07:03,822 - __main__ - INFO - 步骤 4/5: 执行结构分析...
+2025-11-30 06:07:03,822 - analyzer - INFO - 开始结构分析...
+2025-11-30 06:07:03,824 - analyzer - INFO - 车型销量结构分析完成，共 11 个车型
+2025-11-30 06:07:03,827 - analyzer - INFO - 区域销量结构分析完成，共 6 个区域
+2025-11-30 06:07:03,827 - analyzer - INFO - 结构分析完成
+2025-11-30 06:07:03,827 - __main__ - INFO - 步骤 5/5: 执行收入分析...
+2025-11-30 06:07:03,827 - analyzer - INFO - 开始收入和价格分析...
+2025-11-30 06:07:03,836 - analyzer - INFO - 按车型收入分析完成，共 11 个车型
+2025-11-30 06:07:03,840 - analyzer - INFO - 按区域收入分析完成，共 6 个区域
+2025-11-30 06:07:03,844 - analyzer - INFO - 按发动机排量价格分析完成
+2025-11-30 06:07:03,844 - analyzer - INFO - 收入和价格分析完成
+2025-11-30 06:07:03,844 - __main__ - INFO - 生成可视化图表...
+2025-11-30 06:07:03,844 - visualizer - INFO - 开始生成所有图表...
+2025-11-30 06:07:04,056 - visualizer - INFO - ✓ 图表1生成成功: chart_01_year_volume_yoy.png
+2025-11-30 06:07:04,137 - visualizer - INFO - ✓ 图表2生成成功: chart_02_year_revenue_asp.png
+2025-11-30 06:07:04,229 - visualizer - INFO - ✓ 图表3生成成功: chart_03_model_top10_volume.png
+2025-11-30 06:07:04,309 - visualizer - INFO - ✓ 图表4生成成功: chart_04_model_top10_revenue.png
+2025-11-30 06:07:04,399 - visualizer - INFO - ✓ 图表5生成成功: chart_05_model_weighted_asp.png
+2025-11-30 06:07:04,471 - visualizer - INFO - ✓ 图表6生成成功: chart_06_region_volume.png
+2025-11-30 06:07:04,566 - visualizer - INFO - ✓ 图表7生成成功: chart_07_region_revenue.png
+2025-11-30 06:07:04,630 - visualizer - INFO - ✓ 图表8生成成功: chart_08_region_weighted_asp.png
+2025-11-30 06:07:04,706 - visualizer - INFO - ✓ 图表9生成成功: chart_09_year_region_heatmap.png
+2025-11-30 06:07:04,809 - visualizer - INFO - ✓ 图表12生成成功: chart_12_price_distribution.png
+2025-11-30 06:07:04,875 - visualizer - INFO - ✓ 图表13生成成功: chart_13_engine_size_vs_price.png
+2025-11-30 06:07:04,954 - visualizer - INFO - ✓ 图表14生成成功: chart_14_mileage_vs_price.png
+2025-11-30 06:07:04,954 - visualizer - INFO - 所有图表生成完成，共成功生成 12 个图表
+2025-11-30 06:07:04,954 - __main__ - INFO - 图表生成完成
+2025-11-30 06:07:04,954 - __main__ - INFO - 调用LLM生成分析报告...
+2025-11-30 06:07:04,954 - llm_client - INFO - 开始生成AI报告（分段模式）...
+2025-11-30 06:07:04,954 - analyzer - INFO - 开始构建AI报告数据摘要...
+2025-11-30 06:07:04,964 - analyzer - INFO - AI报告数据摘要构建完成，包含 6 个主要维度
+2025-11-30 06:07:04,964 - llm_client - INFO - 开始生成章节: Executive Summary
+2025-11-30 06:07:04,964 - llm_client - INFO - 正在调用 GPT-5 API 生成 Executive Summary...
+2025-11-30 06:07:19,105 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-11-30 06:07:19,123 - llm_client - INFO - ✓ Executive Summary API 调用成功
+2025-11-30 06:07:19,126 - llm_client - INFO - ✓ 章节 Executive Summary 已完成并插入图表
+2025-11-30 06:07:19,126 - llm_client - INFO - 开始生成章节: Sales Performance Over Time
+2025-11-30 06:07:19,126 - llm_client - INFO - 正在调用 GPT-5 API 生成 Sales Performance Over Time...
+2025-11-30 06:07:38,996 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-11-30 06:07:38,999 - llm_client - INFO - ✓ Sales Performance Over Time API 调用成功
+2025-11-30 06:07:39,000 - llm_client - INFO - ✓ 章节 Sales Performance Over Time 已完成并插入图表
+2025-11-30 06:07:39,000 - llm_client - INFO - 开始生成章节: Top & Underperforming Models / Markets
+2025-11-30 06:07:39,000 - llm_client - INFO - 正在调用 GPT-5 API 生成 Top & Underperforming Models / Markets...
+2025-11-30 06:08:05,793 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-11-30 06:08:05,797 - llm_client - INFO - ✓ Top & Underperforming Models / Markets API 调用成功
+2025-11-30 06:08:05,797 - llm_client - INFO - ✓ 章节 Top & Underperforming Models / Markets 已完成并插入图表
+2025-11-30 06:08:05,797 - llm_client - INFO - 开始生成章节: Key Sales Drivers
+2025-11-30 06:08:05,797 - llm_client - INFO - 正在调用 GPT-5 API 生成 Key Sales Drivers...
+2025-11-30 06:08:31,496 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/responses "HTTP/1.1 200 OK"
+2025-11-30 06:08:31,554 - llm_client - INFO - ✓ Key Sales Drivers API 调用成功
+2025-11-30 06:08:31,555 - llm_client - INFO - ✓ 章节 Key Sales Drivers 已完成并插入图表
+2025-11-30 06:08:31,555 - llm_client - INFO - 开始生成章节: Strategic Insights & Recommendations
+2025-11-30 06:08:31,555 - llm_client - INFO - 正在调用 GPT-5 API 生成 Strategic Insights & Recommendations...
+2025-11-30 06:09:07,222 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-11-30 06:09:07,226 - llm_client - INFO - ✓ Strategic Insights & Recommendations API 调用成功
+2025-11-30 06:09:07,226 - llm_client - INFO - ✓ 章节 Strategic Insights & Recommendations 已完成并插入图表
+2025-11-30 06:09:07,229 - llm_client - INFO - AI 生成的分析报告已成功保存到: bmw_sales_ai_report.md
+2025-11-30 06:09:07,230 - __main__ - INFO - ==================================================
+2025-11-30 06:09:07,230 - __main__ - INFO - 所有分析流程执行完成
+2025-11-30 06:09:07,231 - __main__ - INFO - ==================================================

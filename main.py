@@ -7,7 +7,7 @@ from llm_client import generate_ai_report
 
 
 def setup_logging() -> None:
-    """配置日志系统"""
+    """Configure logging system"""
     logging.basicConfig(
         level=logging.INFO,
         format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -20,47 +20,47 @@ def setup_logging() -> None:
 
 def main() -> None:
     """
-    编排完整工作流：
-    1. 读取并清洗数据
-    2. 打印基础与结构性分析
-    3. 生成所有可视化图表
-    4. 调用 LLM 生成 Markdown 报告
+    Orchestrate complete workflow:
+    1. Load and clean data
+    2. Print basic and structural analysis
+    3. Generate all visualization charts
+    4. Call LLM to generate Markdown report
     """
     logger = logging.getLogger(__name__)
     logger.info("=" * 50)
-    logger.info("开始BMW销售数据分析流程")
+    logger.info("Starting BMW sales data analysis workflow")
     logger.info("=" * 50)
     
     try:
-        logger.info("步骤 1/5: 加载数据...")
+        logger.info("Step 1/5: Loading data...")
         df = load_data()
-        logger.info(f"数据加载成功，共 {len(df)} 行数据")
+        logger.info(f"Data loaded successfully, total {len(df)} rows")
 
-        logger.info("步骤 2/5: 执行基础分析...")
+        logger.info("Step 2/5: Performing basic analysis...")
         analyze_basic(df)
         
-        logger.info("步骤 3/5: 执行趋势分析...")
+        logger.info("Step 3/5: Performing trend analysis...")
         analyze_trend(df)
         
-        logger.info("步骤 4/5: 执行结构分析...")
+        logger.info("Step 4/5: Performing structural analysis...")
         analyze_mix(df)
         
-        logger.info("步骤 5/5: 执行收入分析...")
+        logger.info("Step 5/5: Performing revenue analysis...")
         analyze_revenue(df)
 
-        logger.info("生成可视化图表...")
+        logger.info("Generating visualization charts...")
         plot_all_charts(df)
-        logger.info("图表生成完成")
+        logger.info("Chart generation completed")
 
-        logger.info("调用LLM生成分析报告...")
+        logger.info("Calling LLM to generate analysis report...")
         generate_ai_report(df)
         
         logger.info("=" * 50)
-        logger.info("所有分析流程执行完成")
+        logger.info("All analysis workflows completed successfully")
         logger.info("=" * 50)
         
     except Exception as e:
-        logger.error(f"分析流程执行失败: {e}", exc_info=True)
+        logger.error(f"Analysis workflow execution failed: {e}", exc_info=True)
         raise
 
 
